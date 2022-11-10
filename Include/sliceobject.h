@@ -38,25 +38,36 @@ PyAPI_FUNC(int) _PySlice_GetLongIndices(PySliceObject *self, PyObject *length,
                                  PyObject **start_ptr, PyObject **stop_ptr,
                                  PyObject **step_ptr);
 #endif
+Py_DEPRECATED(3.12)
 PyAPI_FUNC(int) PySlice_GetIndices(PyObject *r, Py_ssize_t length,
                                   Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step);
-Py_DEPRECATED(3.7)
-PyAPI_FUNC(int) PySlice_GetIndicesEx(PyObject *r, Py_ssize_t length,
-                                     Py_ssize_t *start, Py_ssize_t *stop,
-                                     Py_ssize_t *step,
-                                     Py_ssize_t *slicelength);
 
 #if !defined(Py_LIMITED_API) || (Py_LIMITED_API+0 >= 0x03050400 && Py_LIMITED_API+0 < 0x03060000) || Py_LIMITED_API+0 >= 0x03060100
-#define PySlice_GetIndicesEx(slice, length, start, stop, step, slicelen) (  \
-    PySlice_Unpack((slice), (start), (stop), (step)) < 0 ?                  \
-    ((*(slicelen) = 0), -1) :                                               \
-    ((*(slicelen) = PySlice_AdjustIndices((length), (start), (stop), *(step))), \
-     0))
+
 PyAPI_FUNC(int) PySlice_Unpack(PyObject *slice,
                                Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step);
 PyAPI_FUNC(Py_ssize_t) PySlice_AdjustIndices(Py_ssize_t length,
                                              Py_ssize_t *start, Py_ssize_t *stop,
                                              Py_ssize_t step);
+Py_DEPRECATED(3.12)
+static inline PyAPI_FUNC(int) PySlice_GetIndicesEx(PyObject *slice, Py_ssize_t length,
+                                        Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
+                                        Py_ssize_t *slicelen) {
+
+    if (PySlice_Unpack(slice, start, stop, step) < 0) {
+        *slicelen = 0;
+        return -1;
+    }
+
+    *slicelen =  PySlice_AdjustIndices(length, start, stop, *step);
+    return 0;
+}
+#else
+Py_DEPRECATED(3.7)
+PyAPI_FUNC(int) PySlice_GetIndicesEx(PyObject *r, Py_ssize_t length,
+                                     Py_ssize_t *start, Py_ssize_t *stop,
+                                     Py_ssize_t *step,
+                                     Py_ssize_t *slicelength);
 #endif
 
 #ifdef __cplusplus

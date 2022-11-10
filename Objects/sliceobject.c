@@ -304,7 +304,7 @@ PySlice_AdjustIndices(Py_ssize_t length,
     return 0;
 }
 
-#undef PySlice_GetIndicesEx
+#if !(!defined(Py_LIMITED_API) || (Py_LIMITED_API+0 >= 0x03050400 && Py_LIMITED_API+0 < 0x03060000) || Py_LIMITED_API+0 >= 0x03060100)
 
 int
 PySlice_GetIndicesEx(PyObject *_r, Py_ssize_t length,
@@ -316,6 +316,8 @@ PySlice_GetIndicesEx(PyObject *_r, Py_ssize_t length,
     *slicelength = PySlice_AdjustIndices(length, start, stop, *step);
     return 0;
 }
+
+#endif
 
 static PyObject *
 slice_new(PyTypeObject *type, PyObject *args, PyObject *kw)
