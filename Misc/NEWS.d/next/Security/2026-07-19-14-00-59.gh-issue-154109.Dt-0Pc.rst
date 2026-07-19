@@ -1,0 +1,2 @@
+Fix memory leak in sqlite3.Connection.load_extension() when error is
+returned
