@@ -102,7 +102,8 @@ class ColorsysTest(unittest.TestCase):
         ]
 
         for (rgb, yiq) in values:
-            self.assertTripleEqual(rgb, colorsys.yiq_to_rgb(*yiq))
+            with self.subTest(rgb=rgb, yiq=yiq):
+                self.assertTripleEqual(rgb, colorsys.yiq_to_rgb(*yiq))
 
     def test_yiq_values(self):
         values = [
